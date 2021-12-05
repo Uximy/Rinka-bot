@@ -1,0 +1,18 @@
+{
+  "name": "Rinka",
+  "version": "1.0.1",
+  "description": "",
+  "main": "Rinka.js",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "fs": "0.0.1-security",
+    "opusscript": "0.0.8",
+    "randomcolor": "^0.6.2"
+  },
+  "scripts": {
+    "start": "node Rinka.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Uximy",
+  "license": "ISC"
+}
