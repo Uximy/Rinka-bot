@@ -13,8 +13,8 @@ node Rinka.js
 
 ![Alt-текст](https://i.ibb.co/9bVqvNL/Screenshot-2.png)
 
-Entering the song title
+# Entering the song title
 ![Alt-текст](https://i.ibb.co/31PDCnr/Screenshot-2.png)
 
-Enter the song's link
+# Enter the song's link
 ![Alt-текст](https://i.ibb.co/Y2NpRpS/Screenshot-3.png)
