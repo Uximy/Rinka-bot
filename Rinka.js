@@ -3,7 +3,7 @@ const robot = new Discord.Client();
 const comms = require("./comms.js");
 const config = require('./Config/config.json');
 const Channels = require('./Config/channels.json');
-var randomColor = require('randomcolor');
+const randomColor = require('randomcolor');
 
 
 function Reloadchannelname(guild) {

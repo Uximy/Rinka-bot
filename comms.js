@@ -1,8 +1,13 @@
 const config = require('./Config/config.json');
 const Discord = require('discord.js');
-const bot = new Discord.Client();
+const robot = new Discord.Client();
 const Channels = require('./Config/channels.json');
 const re = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
+
+
+const ytdl = require('ytdl-core');
+const ytSearch = require('yt-search');
+
 
 //? список функции
 
@@ -121,6 +126,120 @@ function info_channels(robot, mess, args) {
   }
 }
 
+//Music catrgory
+
+async function play(robot, mess, args) {
+  const voiceChannel = mess.member.voice.channel;
+  const permissions = voiceChannel.permissionsFor(mess.client.user);
+  const randomColor = require('randomcolor');
+  if (!voiceChannel) return mess.channel.send("Для выполнения этой команды вы должны находиться в канале!");
+  if (!permissions.has('CONNECT')) return mess.channel.send("У вас нет правильных прав доступа!");
+  if (!permissions.has('SPEAK')) return mess.channel.send("У вас нет правильных прав доступа!");
+  if(!args[1].length) return mess.channel.send("Вам нужно отправить второй аргумент!");
+
+  const validURL = (str) =>{
+    var regex = /(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+    if(!regex.test(str)){
+      return false;
+    }else{ 
+      return true;
+    }
+  }
+
+  if (validURL(args[1])) {
+    const connection = await voiceChannel.join();
+    const stream = ytdl(args[1], {filter: 'audioonly'});
+
+    const videoFinder = async (query) => {
+      const videoResult = await ytSearch(query);
+      console.log(videoResult);
+      return (videoResult.videos.length > 1) ? videoResult.videos[0] : null; // TODO: переписать videoResult.videos[0] потому что он находить по нулевому индексу. Всегда.
+    }
+    const video = await videoFinder(args[1]);
+
+    connection.play(stream, {seek: 0, volume: 1})
+    .on('finish', () => {
+      voiceChannel.leave();
+      mess.channel.send(`${robot.user.username} Вышел из голосового канала`);
+    });
+
+
+    const block = new Discord.MessageEmbed()
+      .setColor(randomColor({luminosity: 'light', hue: 'random'}))
+      .setTitle(
+        `Музыка от ${robot.user.username}`,
+      )
+      .setURL(video.url)
+      .setDescription(`
+      :musical_note: Сейчас играет: ***${video.title}***,
+      :alarm_clock: Время песни: ${video.timestamp},
+      :man_detective: Добавил: ***${mess.author.username}***
+      `)
+      .setAuthor(`Автор видео: ${video.author.name}`)
+      .setFooter(`Музыка на канале: ${connection.channel.name}`)
+      .setThumbnail(video.image);
+
+    const reply = `${mess.author}`;
+
+    console.log(video);
+
+    mess.channel.send(reply ,block);
+
+    return
+  }
+
+  const connection = await voiceChannel.join();
+
+  const videoFinder = async (query) => {
+    const videoResult = await ytSearch(query);
+
+    return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
+
+  }
+
+  const video = await videoFinder(args.join(' '));
+
+  if (video) {
+    const stream = ytdl(video.url, {filter: 'audioonly'});
+    connection.play(stream, {seek: 0, volume: 1})
+    .on('finish', () => {
+      voiceChannel.leave();
+      mess.channel.send(`${robot.user.username} Вышел из голосового канала`);
+    });
+
+    const block = new Discord.MessageEmbed()
+      .setColor(randomColor({luminosity: 'light', hue: 'random'}))
+      .setTitle(
+        `Музыка от ${robot.user.username}`,
+      )
+      .setURL(video.url)
+      .setDescription(`
+      :musical_note: Сейчас играет: ***${video.title}***,
+      :alarm_clock: Время песни: ${video.timestamp},
+      :man_detective: Добавил: ***${mess.author.username}***
+      `)
+      .setAuthor(`Автор видео: ${video.author.name}`)
+      .setFooter(`Музыка на канале: ${connection.channel.name}`)
+      .setThumbnail(video.image);
+
+      const reply = `${mess.author}`;
+
+      mess.channel.send(reply ,block);
+
+  }else{
+    mess.channel.send("Результаты поиска не найдены!");
+  }
+}
+
+async function stop(robot, mess, args) {
+  const voiceChannel = mess.member.voice.channel;
+
+
+  if (!voiceChannel) return mess.channel.send("Вы должны быть в голосовом канале, чтобы остановить музыку!");
+  await voiceChannel.leave();
+  await mess.channel.send(`${robot.user.username} Вышел из голосового канала :smiling_face_with_tear:`);
+}
+
 //? вызов функции
 var comms_list = [
   {
@@ -134,6 +253,17 @@ var comms_list = [
   {
     name: "setupStats",
     out: info_channels
+  },
+
+
+  //Music catrgory
+  {
+    name: "play",
+    out: play
+  },
+  {
+    name: "stop",
+    out: stop
   }
 ];
 
