@@ -58,7 +58,7 @@ function info_channels(robot, mess, args) {
 
   var result = [];
 
-  const category = robot.channels.cache.find(ct => ct.name.startsWith("📊 Статистика Канала 📊"));
+  const category = robot.channels.cache.find(ct => ct.name.startsWith("📊 Статистика Канала"));
 
   for (let i = 0; i < arr.length; i++) {
     result.push(arr[i].Name);
@@ -66,7 +66,7 @@ function info_channels(robot, mess, args) {
 
   function channels() {
     if (eval("for (let i = 0; i < result.length; i++) {robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]))}")) {
-      mess.channel.send("[Ошибка]: Данные каналы уже существуют!");
+      mess.channel.send("⛔ [Ошибка]: Данные каналы уже существуют!");
     }
     else{
       for(const key in Channels.channels){
@@ -95,10 +95,11 @@ function info_channels(robot, mess, args) {
               allow: ['VIEW_CHANNEL','MANAGE_CHANNELS','READ_MESSAGE_HISTORY'],
             }
           ],
-          parent: robot.channels.cache.find(ct => ct.name.startsWith("📊 Статистика Канала 📊")).id,
+          parent: robot.channels.cache.find(ct => ct.name.startsWith("📊 Статистика Канала")).id,
         })
         .catch(console.error);
       }
+      mess.channel.send("⚠ [Уведомление]: Обновления статистики будет происходить каждый 10 минут!");
     }
   }
 
@@ -132,7 +133,7 @@ var comms_list = [
     out: clearMessage,
   },
   {
-    name: "createStatschannels",
+    name: "setupStats",
     out: info_channels
   }
 ];

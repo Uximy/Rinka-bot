@@ -4,7 +4,9 @@ const comms = require("./comms.js");
 const config = require('./Config/config.json');
 const Channels = require('./Config/channels.json');
 var randomColor = require('randomcolor');
+const guild = robot.guilds.fetch("809499536702570566");
 
+const boolT = true;
 
 robot.on("ready", () =>{
   robot.user.setPresence({
@@ -42,19 +44,19 @@ robot.on('message', (msg) => {
 
 function Reloadchannelname(mess) {
   const arr = Object.values(Channels.channels);
-
   var result = [];
-
   const channel_info = null;
+  const category = [];
   
   for (let i = 0; i < arr.length; i++) {
     result.push(arr[i].Name);
   }
-
+  for (const value in Channels.channels) {
+    category.push(value);
+  }
   for (let i = 0; i < result.length; i++) {
     const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
-    console.log(channel_info);
-    channel_info.setName(`${Channels.channels.users.Name} ${eval(Channels.channels.users.count_users)}`);
+    channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`);
   }
 }
 
@@ -65,15 +67,14 @@ robot.on('guildMemberAdd', async (member) => {
       .setTitle(
         `${member.displayName} добро пожаловать на сервер ${member.guild.name}`,
       )
-      .setDescription(`Рофлодарова, Дружочек-пирожочек, заходи и выбирай роль в ${robot.channels.cache.get(config.role_channel,)}`,)
+      .setDescription(`Рофлодарова, Дружочек-пирожочек, заходи и выбирай роль в ${robot.channels.cache.get(config.role_channel)}`,)
       .setThumbnail(member.user.displayAvatarURL());
     member.roles.add(member.guild.roles.cache.get(config.userRole));
 
     const channel = await robot.channels.fetch(config.glav_channel);
-    // channel.send(member.user, block);
+    channel.send(member.user, block);
 
-    Reloadchannelname(member);
-
+    setTimeout(Reloadchannelname, 600000, member);
   } catch (err) {
     console.log(`[ERROR]: ${err}`);
   }
@@ -81,9 +82,8 @@ robot.on('guildMemberAdd', async (member) => {
 robot.on('guildMemberRemove', async (member) => {
   try{
     const channel = await robot.channels.fetch(config.glav_channel);
-    // channel.send(`${member.user.username} покинул(-а) наше игровое сообщество... :'(`);
-
-    Reloadchannelname(member);
+    channel.send(`${member.user.username} покинул(-а) наше игровое сообщество... :'(`);
+    setTimeout(Reloadchannelname, 600000, member);
   }catch(err){
     console.log(`[ERROR] ${err}`)
   }
