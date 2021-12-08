@@ -2,15 +2,15 @@
     "channels": {
         "users": {
             "Name": "👪 Всего участников:",
-            "count_users": "mess.guild.memberCount"
+            "count_users": "guild.memberCount"
         },
         "user": {
             "Name": "👨 Пользователей:",
-            "count_users": "mess.guild.members.cache.filter(m=>!m.user.bot).size"
+            "count_users": "guild.members.cache.filter(m=>!m.user.bot).size"
         },
         "bots": {
             "Name": "🤖 Боты:",
-            "count_users": "mess.guild.members.cache.filter(m=>m.user.bot).size"
+            "count_users": "guild.members.cache.filter(m=>m.user.bot).size"
         }
     }
 }

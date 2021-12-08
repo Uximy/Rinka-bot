@@ -4,9 +4,26 @@ const comms = require("./comms.js");
 const config = require('./Config/config.json');
 const Channels = require('./Config/channels.json');
 var randomColor = require('randomcolor');
-const guild = robot.guilds.fetch("809499536702570566");
 
-const boolT = true;
+
+function Reloadchannelname(guild) {
+  const arr = Object.values(Channels.channels);
+  var result = [];
+  const channel_info = null;
+  const category = [];
+  
+  for (let i = 0; i < arr.length; i++) {
+    result.push(arr[i].Name);
+  }
+  for (const value in Channels.channels) {
+    category.push(value);
+  }
+  for (let i = 0; i < result.length; i++) {
+    const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
+    channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`)
+    .then(console.log("Работает раз в 10 минут!!!!!"));
+  }
+}
 
 robot.on("ready", () =>{
   robot.user.setPresence({
@@ -18,6 +35,10 @@ robot.on("ready", () =>{
   });
   console.log(`Бот ${robot.user.username} готов(-ва) к работе!`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);
+
+  const guild = robot.guilds.cache.get("809499536702570566");
+
+  setInterval(Reloadchannelname, 600000, guild);
 });
 robot.on("reconnecting", () => {
   console.log(`Бот ${robot.user.username} реконектится!`);
@@ -41,24 +62,6 @@ robot.on('message', (msg) => {
     }
   }
 });
-
-function Reloadchannelname(mess) {
-  const arr = Object.values(Channels.channels);
-  var result = [];
-  const channel_info = null;
-  const category = [];
-  
-  for (let i = 0; i < arr.length; i++) {
-    result.push(arr[i].Name);
-  }
-  for (const value in Channels.channels) {
-    category.push(value);
-  }
-  for (let i = 0; i < result.length; i++) {
-    const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
-    channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`);
-  }
-}
 
 robot.on('guildMemberAdd', async (member) => {
   try {
@@ -87,23 +90,25 @@ robot.on('guildMemberRemove', async (member) => {
   }catch(err){
     console.log(`[ERROR] ${err}`)
   }
-    
 })
 
 robot.on('message', function(msg) {
-    msg.content = msg.content.toLowerCase();
-    if(msg.content.includes(`discord.gg`) && !(checkRole(msg.member))) {
-        msg.delete();
-    }
+  msg.content = msg.content.toLowerCase();
+  if(msg.content.includes(`discord.gg`) && !(checkRole(msg.member))) {
+      msg.delete();
+  }
 });
 
 function checkRole(member) 
 {
-    for(let i = 0; i < config.roleImmunityId.length; i++) 
-    {
-        if(member.roles.cache.get(config.roleImmunityId[i])) return 1;
-    }
-    return 0;
+  for(let i = 0; i < config.roleImmunityId.length; i++) 
+  {
+      if(member.roles.cache.get(config.roleImmunityId[i])) return 1;
+  }
+  return 0;
 }
 
+
+
 robot.login(config.token);
+

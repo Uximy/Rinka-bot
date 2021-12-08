@@ -1,6 +1,6 @@
 const config = require('./Config/config.json');
 const Discord = require('discord.js');
-const robot = new Discord.Client();
+const bot = new Discord.Client();
 const Channels = require('./Config/channels.json');
 const re = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
 
@@ -53,13 +53,12 @@ function ping(robot, mess, args) {
 }
 
 function info_channels(robot, mess, args) {
-
   const arr = Object.values(Channels.channels);
-
   var result = [];
-
   const category = robot.channels.cache.find(ct => ct.name.startsWith("📊 Статистика Канала"));
+  const guild = robot.guilds.cache.get("809499536702570566");
 
+  
   for (let i = 0; i < arr.length; i++) {
     result.push(arr[i].Name);
   }
