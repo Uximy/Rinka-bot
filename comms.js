@@ -152,7 +152,6 @@ async function play(robot, mess, args) {
 
     const videoFinder = async (query) => {
       const videoResult = await ytSearch(query);
-      console.log(videoResult);
       return (videoResult.videos.length > 1) ? videoResult.videos[0] : null; // TODO: переписать videoResult.videos[0] потому что он находить по нулевому индексу. Всегда.
     }
     const video = await videoFinder(args[1]);
@@ -181,8 +180,6 @@ async function play(robot, mess, args) {
 
     const reply = `${mess.author}`;
 
-    console.log(video);
-
     mess.channel.send(reply ,block);
 
     return
@@ -192,9 +189,7 @@ async function play(robot, mess, args) {
 
   const videoFinder = async (query) => {
     const videoResult = await ytSearch(query);
-
     return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
-
   }
 
   const video = await videoFinder(args.join(' '));
