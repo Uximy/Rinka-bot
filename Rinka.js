@@ -18,11 +18,16 @@ function Reloadchannelname(guild) {
   for (const value in Channels.channels) {
     category.push(value);
   }
-  for (let i = 0; i < result.length; i++) {
-    const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
-    channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`)
-    .then(console.log("Работает раз в 10 минут!!!!!"));
+
+  function reload() {
+    for (let i = 0; i < result.length; i++) {
+      const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
+      channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`)
+      .then(console.log("Работает раз в 10 минут!!!!!"));
+    }
   }
+
+  setTimeout(reload, 8000);
 }
 
 robot.on("ready", () =>{
