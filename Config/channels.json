@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "channels": {
         "users": {
@@ -13,4 +14,21 @@
             "count_users": "mess.guild.members.cache.filter(m=>m.user.bot).size"
         }
     }
+=======
+{
+    "channels": {
+        "users": {
+            "Name": "👪 Всего участников:",
+            "count_users": "mess.guild.memberCount"
+        },
+        "user": {
+            "Name": "👨 Пользователей:",
+            "count_users": "mess.guild.members.cache.filter(m=>!m.user.bot).size"
+        },
+        "bots": {
+            "Name": "🤖 Боты:",
+            "count_users": "mess.guild.members.cache.filter(m=>m.user.bot).size"
+        }
+    }
+>>>>>>> 3b9328ca2ea4d6bd78c43f8ede7d0d2b839520f0
 }
