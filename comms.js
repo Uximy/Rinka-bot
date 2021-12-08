@@ -106,7 +106,7 @@ function info_channels(robot, mess, args) {
   if (category) {
     channels();
   }else{
-    mess.guild.channels.create('📊 Статистика Канала 📊',{
+    mess.guild.channels.create("📊 Статистика Канала",{
       type: "category",
       permissionOverwrites: [
         {
