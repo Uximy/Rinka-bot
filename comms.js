@@ -129,47 +129,47 @@ function info_channels(robot, mess, args) {
 //Music catrgory
 
 async function play(robot, mess, args) {
-  const voiceChannel = mess.member.voice.channel;
-  const permissions = voiceChannel.permissionsFor(mess.client.user);
-  const randomColor = require('randomcolor');
-  if (!voiceChannel) return mess.channel.send("Для выполнения этой команды вы должны находиться в канале!");
-  if (!permissions.has('CONNECT')) return mess.channel.send("У вас нет правильных прав доступа!");
-  if (!permissions.has('SPEAK')) return mess.channel.send("У вас нет правильных прав доступа!");
-  if(!args[1].length) return mess.channel.send("Вам нужно отправить второй аргумент!");
+  try {
+    const voiceChannel = mess.member.voice.channel;
+    const permissions = voiceChannel.permissionsFor(mess.client.user);
+    const randomColor = require('randomcolor');
+    if (!voiceChannel) return mess.channel.send("Для выполнения этой команды вы должны находиться в канале!");
+    if (!permissions.has('CONNECT')) return mess.channel.send("У вас нет правильных прав доступа!");
+    if (!permissions.has('SPEAK')) return mess.channel.send("У вас нет правильных прав доступа!");
+    if(!args[1].length) return mess.channel.send("Вам нужно отправить второй аргумент!");
 
-  const validURL = (str) =>{
-    var regex = /(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-    if(!regex.test(str)){
-      return false;
-    }else{ 
-      return true;
-    }
-  }
-
-  if (validURL(args[1])) {
-    const connection = await voiceChannel.join();
-    const stream = ytdl(args[1], {filter: 'audioonly'});
-
-    const videoFinder = async (query) => {
-      const regex = /&[a-z]=[0-9][a-z]|&[a-z]*_[a-z]*=[A-Z, a-z, 0-9].*/gm
-      const newQuery = query.replace(regex, '');
-      const videoResult = await ytSearch(newQuery);
-
-      for (let i = 0; i < videoResult.videos.length; i++) {
-        if (videoResult.videos[i].url = newQuery) {
-          return (videoResult.videos.length >= 1) ? videoResult.videos[i] : null;
-        }
+    const validURL = (str) =>{
+      var regex = /(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+      if(!regex.test(str)){
+        return false;
+      }else{ 
+        return true;
       }
     }
 
-    const video = await videoFinder(args[1]);
-    connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25})
-    .on('finish', () => {
-      
-    });
+    if (validURL(args[1])) {
+      const videoFinder = async (query) => {
+        const regex = /&[a-z]=[0-9][a-z]|&[a-z]*_[a-z]*=[A-Z, a-z, 0-9].*/gm
+        const newQuery = query.replace(regex, '');
+        const videoResult = await ytSearch(newQuery);
 
+        for (let i = 0; i < videoResult.videos.length; i++) {
+          if (videoResult.videos[i].url = newQuery) {
+            return (videoResult.videos.length >= 1) ? videoResult.videos[i] : null;
+          }
+        }
+      }
 
-    try {
+      // console.log(args[2]);
+      const video = await videoFinder(args[1]);
+      const stream = ytdl(video.url, {filter: 'audioonly'});
+      const connection = await voiceChannel.join();
+      connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25})
+      .on('finish', () => {
+        
+      });
+
+      const reply = `${mess.author}`;
       const block = new Discord.MessageEmbed()
       .setColor(randomColor({luminosity: 'light', hue: 'random'}))
       .setTitle(
@@ -185,62 +185,61 @@ async function play(robot, mess, args) {
       .setFooter(`Музыка на канале: ${connection.channel.name}`)
       .setThumbnail(video.image);
 
-      const reply = `${mess.author}`;
-
       mess.channel.send(reply ,block);
 
-    } catch (error) {
-      console.error(error);
+      return
     }
 
-    return
-  }
+    const connection = await voiceChannel.join();
+    const videoFinder = async (query) => {
+      const videoResult = await ytSearch(query);
+      return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
+    }
+    const video = await videoFinder(args.join(' '));
 
-  const connection = await voiceChannel.join();
+    if (video) {
+      const stream = ytdl(video.url, {filter: 'audioonly'});
+      connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25})
+      .on('finish', () => {
+        
+      });
 
-  const videoFinder = async (query) => {
-    const videoResult = await ytSearch(query);
-    return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
-  }
+      const block = new Discord.MessageEmbed()
+        .setColor(randomColor({luminosity: 'light', hue: 'random'}))
+        .setTitle(
+          `Музыка от ${robot.user.username}`,
+        )
+        .setURL(video.url)
+        .setDescription(`
+        :musical_note: Сейчас играет: ***${video.title}***,
+        :alarm_clock: Время песни: ${video.timestamp},
+        :man_detective: Добавил: ***${mess.author.username}***
+        `)
+        .setAuthor(`Автор видео: ${video.author.name}`)
+        .setFooter(`Музыка на канале: ${connection.channel.name}`)
+        .setThumbnail(video.image);
 
-  const video = await videoFinder(args.join(' '));
+        const reply = `${mess.author}`;
 
-  if (video) {
-    const stream = ytdl(video.url, {filter: 'audioonly'});
-    connection.play(stream, {seek: 0, volume: 1})
-    .on('finish', () => {
-      
-    });
+        mess.channel.send(reply ,block);
 
-    const block = new Discord.MessageEmbed()
-      .setColor(randomColor({luminosity: 'light', hue: 'random'}))
-      .setTitle(
-        `Музыка от ${robot.user.username}`,
-      )
-      .setURL(video.url)
-      .setDescription(`
-      :musical_note: Сейчас играет: ***${video.title}***,
-      :alarm_clock: Время песни: ${video.timestamp},
-      :man_detective: Добавил: ***${mess.author.username}***
-      `)
-      .setAuthor(`Автор видео: ${video.author.name}`)
-      .setFooter(`Музыка на канале: ${connection.channel.name}`)
-      .setThumbnail(video.image);
-
-      const reply = `${mess.author}`;
-
-      mess.channel.send(reply ,block);
-
-  }else{
-    mess.channel.send("Результаты поиска не найдены!");
+    }else{
+      mess.channel.send("Результаты поиска не найдены!");
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
 async function leave(robot, mess, args) {
-  const voiceChannel = mess.member.voice.channel;
+  try {
+    const voiceChannel = mess.member.voice.channel;
   if (!voiceChannel) return mess.channel.send("Вы должны быть в голосовом канале, чтобы остановить музыку!");
   await voiceChannel.stop();
   await mess.channel.send(`${robot.user.username} Вышла(-шел) из голосового канала.`);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 async function skip(robot, mess, args) {
