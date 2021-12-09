@@ -151,19 +151,26 @@ async function play(robot, mess, args) {
     const stream = ytdl(args[1], {filter: 'audioonly'});
 
     const videoFinder = async (query) => {
-      const videoResult = await ytSearch(query);
-      return (videoResult.videos.length > 1) ? videoResult.videos[0] : null; // TODO: переписать videoResult.videos[0] потому что он находить по нулевому индексу. Всегда.
-    }
-    const video = await videoFinder(args[1]);
+      const regex = /&[a-z]=[0-9][a-z]|&[a-z]*_[a-z]*=[A-Z, a-z, 0-9].*/gm
+      const newQuery = query.replace(regex, '');
+      const videoResult = await ytSearch(newQuery);
 
-    connection.play(stream, {seek: 0, volume: 1})
+      for (let i = 0; i < videoResult.videos.length; i++) {
+        if (videoResult.videos[i].url = newQuery) {
+          return (videoResult.videos.length >= 1) ? videoResult.videos[i] : null;
+        }
+      }
+    }
+
+    const video = await videoFinder(args[1]);
+    connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25})
     .on('finish', () => {
-      voiceChannel.leave();
-      mess.channel.send(`${robot.user.username} Вышел из голосового канала`);
+      
     });
 
 
-    const block = new Discord.MessageEmbed()
+    try {
+      const block = new Discord.MessageEmbed()
       .setColor(randomColor({luminosity: 'light', hue: 'random'}))
       .setTitle(
         `Музыка от ${robot.user.username}`,
@@ -178,9 +185,13 @@ async function play(robot, mess, args) {
       .setFooter(`Музыка на канале: ${connection.channel.name}`)
       .setThumbnail(video.image);
 
-    const reply = `${mess.author}`;
+      const reply = `${mess.author}`;
 
-    mess.channel.send(reply ,block);
+      mess.channel.send(reply ,block);
+
+    } catch (error) {
+      console.error(error);
+    }
 
     return
   }
@@ -198,8 +209,7 @@ async function play(robot, mess, args) {
     const stream = ytdl(video.url, {filter: 'audioonly'});
     connection.play(stream, {seek: 0, volume: 1})
     .on('finish', () => {
-      voiceChannel.leave();
-      mess.channel.send(`${robot.user.username} Вышел из голосового канала`);
+      
     });
 
     const block = new Discord.MessageEmbed()
@@ -226,13 +236,17 @@ async function play(robot, mess, args) {
   }
 }
 
-async function stop(robot, mess, args) {
+async function leave(robot, mess, args) {
   const voiceChannel = mess.member.voice.channel;
-
-
   if (!voiceChannel) return mess.channel.send("Вы должны быть в голосовом канале, чтобы остановить музыку!");
-  await voiceChannel.leave();
-  await mess.channel.send(`${robot.user.username} Вышел из голосового канала :smiling_face_with_tear:`);
+  await voiceChannel.stop();
+  await mess.channel.send(`${robot.user.username} Вышла(-шел) из голосового канала.`);
+}
+
+async function skip(robot, mess, args) {
+    const server = mess.guild.id;
+    console.log(server.dispatcher);
+    if (server.dispatcher) return server.dispatcher.end();
 }
 
 //? вызов функции
@@ -257,8 +271,12 @@ var comms_list = [
     out: play
   },
   {
-    name: "stop",
-    out: stop
+    name: "leave",
+    out: leave
+  },
+  {
+    name: "skip",
+    out: skip
   }
 ];
 
