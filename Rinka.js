@@ -20,9 +20,13 @@ function Reloadchannelname(guild) {
   }
 
   function reload() {
-    for (let i = 0; i < result.length; i++) {
-      const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
-      channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`);
+    try {
+      for (let i = 0; i < result.length; i++) {
+        const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
+        channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -44,6 +48,8 @@ robot.on("ready", () =>{
 
   setInterval(Reloadchannelname, 600000, guild);
 });
+
+
 robot.on("reconnecting", () => {
   console.log(`Бот ${robot.user.username} реконектится!`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);

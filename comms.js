@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const robot = new Discord.Client();
 const Channels = require('./Config/channels.json');
 const re = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
+const {Player} = require('discord-player');
 
 
 const ytdl = require('ytdl-core');
@@ -129,57 +130,45 @@ function info_channels(robot, mess, args) {
 //Music catrgory
 
 async function play(robot, mess, args) {
-  try {
-    const voiceChannel = mess.member.voice.channel;
-    const permissions = voiceChannel.permissionsFor(mess.client.user);
-    const randomColor = require('randomcolor');
-    if (!voiceChannel) return mess.channel.send("Для выполнения этой команды вы должны находиться в канале!");
-    if (!permissions.has('CONNECT')) return mess.channel.send("У вас нет правильных прав доступа!");
-    if (!permissions.has('SPEAK')) return mess.channel.send("У вас нет правильных прав доступа!");
-    if(!args[1].length) return mess.channel.send("Вам нужно отправить второй аргумент!");
-
+  const voiceChannel = mess.member.voice.channel;
+  const randomColor = require('randomcolor');
+  if(!args[1].length) return mess.channel.send("⛔ [Ошибка]: Вам нужно отправить ссылку на видео из YouTube или Названия песни!");
+  try {    
     const validURL = (str) =>{
-      var regex = /(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+      var regex = /^((http|https)\:\/\/)?(www\.youtube\.com|youtu\.?be)\/((watch\?v=)?([a-zA-Z0-9]{11}))(&.*)*$/; //? Old Regex "/(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;"
       if(!regex.test(str)){
         return false;
       }else{ 
         return true;
       }
     }
-
+    
+    //! Plays the link
     if (validURL(args[1])) {
       const videoFinder = async (query) => {
-        const regex = /&[a-z]=[0-9][a-z]|&[a-z]*_[a-z]*=[A-Z, a-z, 0-9].*/gm
-        const newQuery = query.replace(regex, '');
+        const regexDeleteabchannel = /(&.*)*$/gm //? Old Regex /&[a-z]=[0-9][a-z]|&[a-z]*_[a-z]*=[A-Z, a-z, 0-9].*/gm
+        const newQuery = query.replace(regexDeleteabchannel, '');
         const videoResult = await ytSearch(newQuery);
 
-        for (let i = 0; i < videoResult.videos.length; i++) {
-          if (videoResult.videos[i].url = newQuery) {
-            return (videoResult.videos.length >= 1) ? videoResult.videos[i] : null;
+        for (let i = 0; i < videoResult.all.length; i++) {
+          if (videoResult.all[i].url = newQuery) {
+            return (videoResult.all.length >= 1) ? videoResult.all[i] : null;
           }
         }
       }
 
-      // console.log(args[2]);
       const video = await videoFinder(args[1]);
-      const stream = ytdl(video.url, {filter: 'audioonly'});
+      const stream = ytdl(video.url, {filter: 'audio'});
       const connection = await voiceChannel.join();
-      connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25})
-      .on('finish', () => {
-        
-      });
+      connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25});
 
       const reply = `${mess.author}`;
       const block = new Discord.MessageEmbed()
       .setColor(randomColor({luminosity: 'light', hue: 'random'}))
-      .setTitle(
-        `Музыка от ${robot.user.username}`,
-      )
-      .setURL(video.url)
       .setDescription(`
-      :musical_note: Сейчас играет: ***${video.title}***,
-      :alarm_clock: Время песни: ${video.timestamp},
-      :man_detective: Добавил: ***${mess.author.username}***
+      :musical_note: Сейчас играет: **[${video.title}](${video.url})**,
+      :alarm_clock: Время песни:  ${video.timestamp ? video.timestamp : ":infinity:"},
+      :man_detective: Добавил: **${mess.author.username}**
       `)
       .setAuthor(`Автор видео: ${video.author.name}`)
       .setFooter(`Музыка на канале: ${connection.channel.name}`)
@@ -190,30 +179,25 @@ async function play(robot, mess, args) {
       return
     }
 
+    //! Reproduces the text
     const connection = await voiceChannel.join();
     const videoFinder = async (query) => {
       const videoResult = await ytSearch(query);
-      return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
+      return (videoResult.videos.length >= 1) ? videoResult.videos[0] : null;
     }
     const video = await videoFinder(args.join(' '));
 
     if (video) {
       const stream = ytdl(video.url, {filter: 'audioonly'});
-      connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25})
-      .on('finish', () => {
-        
-      });
+      connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25});
+      // .on('finish', () => {});
 
       const block = new Discord.MessageEmbed()
         .setColor(randomColor({luminosity: 'light', hue: 'random'}))
-        .setTitle(
-          `Музыка от ${robot.user.username}`,
-        )
-        .setURL(video.url)
         .setDescription(`
-        :musical_note: Сейчас играет: ***${video.title}***,
+        :musical_note: Сейчас играет: **[${video.title}](${video.url})**,
         :alarm_clock: Время песни: ${video.timestamp},
-        :man_detective: Добавил: ***${mess.author.username}***
+        :man_detective: Добавил: **${mess.author.username}**
         `)
         .setAuthor(`Автор видео: ${video.author.name}`)
         .setFooter(`Музыка на канале: ${connection.channel.name}`)
@@ -224,17 +208,22 @@ async function play(robot, mess, args) {
         mess.channel.send(reply ,block);
 
     }else{
-      mess.channel.send("Результаты поиска не найдены!");
+      mess.channel.send("⚠ [Предупреждение]: Результаты поиска не найдены!");
     }
   } catch (error) {
+    if (!voiceChannel) return mess.channel.send("⛔ [Ошибка]: Для выполнения этой команды вы должны находиться в канале где находится бот!");
+    const permissions = voiceChannel.permissionsFor(mess.client.user);
+    if (!permissions.has('CONNECT')) return mess.channel.send("⚠ [Предупреждение]: У меня нет право присоединяться к голосовому каналу!");
+    if (!permissions.has('SPEAK')) return mess.channel.send("⚠ [Предупреждение]: У меня нет право говорить на данном голосовом канале!");
     console.error(error);
+    mess.channel.send("⛔ [Ошибка]: Не возможно воспроизвести данную музыку, возможно вы ввели битую ссылкую.");
   }
 }
 
 async function leave(robot, mess, args) {
   try {
     const voiceChannel = mess.member.voice.channel;
-  if (!voiceChannel) return mess.channel.send("Вы должны быть в голосовом канале, чтобы остановить музыку!");
+  if (!voiceChannel) return mess.channel.send("⛔ [Ошибка]: Для выполнения этой команды вы должны находиться в канале где находится бот!");
   await voiceChannel.stop();
   await mess.channel.send(`${robot.user.username} Вышла(-шел) из голосового канала.`);
   } catch (error) {
@@ -242,10 +231,17 @@ async function leave(robot, mess, args) {
   }
 }
 
-async function skip(robot, mess, args) {
-    const server = mess.guild.id;
-    console.log(server.dispatcher);
-    if (server.dispatcher) return server.dispatcher.end();
+async function skip(robot1, mess, args) {
+  try {
+    const player = new Player(robot);
+    const voiceChannel = mess.member.voice.channel;
+    if (!voiceChannel) return mess.channel.send("⛔ [Ошибка]: Для выполнения этой команды вы должны находиться в канале где находится бот!");
+    const quest =  player.getQueue(mess.guild.id);
+    quest.setPaused(true);
+  } catch (error) {
+    console.error(error);
+  }
+
 }
 
 //? вызов функции
@@ -270,7 +266,7 @@ var comms_list = [
     out: play
   },
   {
-    name: "leave",
+    name: "stop",
     out: leave
   },
   {
