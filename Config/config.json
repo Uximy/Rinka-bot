@@ -1,8 +1,11 @@
 {
     "token": "TOKEN",
     "prefix": "r.",
-    "status": "Хентай!",
-    "typestatus": "WATCHING",
+    "activity": {
+        "PresenceStatus" : "dnd",
+        "status": "Хентай!",
+        "typestatus": "WATCHING"
+    },
     "glav_channel": "809499536716070939",
     "role_channel": "809499536716070941",
     "roledeveloper": "809872227326623755",

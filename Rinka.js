@@ -35,11 +35,11 @@ function Reloadchannelname(guild) {
 
 robot.on("ready", () =>{
   robot.user.setPresence({
+    status: config.activity.PresenceStatus,
     activity: {
-      name: config.status,
-      type: config.typestatus,
-    },
-    status: "dnd"
+      name: config.activity.status,
+      type: config.activity.typestatus,
+    }
   });
   console.log(`Бот ${robot.user.username} готов(-ва) к работе!`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);
