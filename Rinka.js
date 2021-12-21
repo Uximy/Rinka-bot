@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const robot = new Discord.Client();
 const comms = require("./comms.js");
-const config = require('./Config/config.json');
+let config = require('./Config/config.json');
 const Channels = require('./Config/channels.json');
 const randomColor = require('randomcolor');
 
@@ -105,20 +105,17 @@ robot.on('guildMemberRemove', async (member) => {
 robot.on('message', function(msg) {
   msg.content = msg.content.toLowerCase();
   if(msg.content.includes(`discord.gg`) && !(checkRole(msg.member))) {
-      msg.delete();
+    msg.delete();
   }
 });
 
 function checkRole(member) 
 {
-  for(let i = 0; i < config.roleImmunityId.length; i++) 
+  for(let i = 0; i <= config.roleImmunityId.length; i++) 
   {
-      if(member.roles.cache.get(config.roleImmunityId[i])) return 1;
+    if(member.roles.cache.get(config.roleImmunityId[i])) return 1;
   }
   return 0;
 }
 
-
-
 robot.login(config.token);
-
