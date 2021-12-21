@@ -1,11 +1,7 @@
 const config = require('./Config/config.json');
 const Discord = require('discord.js');
-const robot = new Discord.Client();
 const Channels = require('./Config/channels.json');
-const re = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
-const {Player} = require('discord-player');
-
-
+// const re = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g; // регялрка убирающая смайлы
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 
@@ -62,8 +58,6 @@ function info_channels(robot, mess, args) {
   const arr = Object.values(Channels.channels);
   var result = [];
   const category = robot.channels.cache.find(ct => ct.name.startsWith("📊 Статистика Канала"));
-  const guild = robot.guilds.cache.get("809499536702570566");
-
   
   for (let i = 0; i < arr.length; i++) {
     result.push(arr[i].Name);
@@ -127,7 +121,7 @@ function info_channels(robot, mess, args) {
   }
 }
 
-//Music catrgory
+//? Music catrgory
 
 async function play(robot, mess, args) {
   const voiceChannel = mess.member.voice.channel;
@@ -135,7 +129,7 @@ async function play(robot, mess, args) {
   if(!args[1].length) return mess.channel.send("⛔ [Ошибка]: Вам нужно отправить ссылку на видео из YouTube или Названия песни!");
   try {    
     const validURL = (str) =>{
-      var regex = /^((http|https)\:\/\/)?(www\.youtube\.com|youtu\.?be)\/((watch\?v=)?([a-zA-Z0-9]{11}))(&.*)*$/; //? Old Regex "/(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;"
+      var regex = /^((http|https)\:\/\/)?(www\.youtube\.com|youtu\.?be)\/((watch\?v=)?([a-zA-Z0-9\w]{11}))(&.*)*$/; //? Old Regex "/(http|https):\/\/(\w:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;"
       if(!regex.test(str)){
         return false;
       }else{ 
@@ -162,19 +156,18 @@ async function play(robot, mess, args) {
       const connection = await voiceChannel.join();
       connection.play(stream, {seek: 0, volume: 1, quality: 'highestaudio', highWaterMark: 1 << 25});
 
-      const reply = `${mess.author}`;
       const block = new Discord.MessageEmbed()
       .setColor(randomColor({luminosity: 'light', hue: 'random'}))
       .setDescription(`
       :musical_note: Сейчас играет: **[${video.title}](${video.url})**,
-      :alarm_clock: Время песни:  ${video.timestamp ? video.timestamp : ":infinity:"},
-      :man_detective: Добавил: **${mess.author.username}**
+      :man_detective: Добавил: **${mess.author.username}**,
+      :alarm_clock: Время песни:  ${video.timestamp ? video.timestamp : ":infinity:"}
       `)
       .setAuthor(`Автор видео: ${video.author.name}`)
       .setFooter(`Музыка на канале: ${connection.channel.name}`)
       .setThumbnail(video.image);
 
-      mess.channel.send(reply ,block);
+      mess.channel.send(mess.author ,block);
 
       return
     }
@@ -196,16 +189,14 @@ async function play(robot, mess, args) {
         .setColor(randomColor({luminosity: 'light', hue: 'random'}))
         .setDescription(`
         :musical_note: Сейчас играет: **[${video.title}](${video.url})**,
-        :alarm_clock: Время песни: ${video.timestamp},
-        :man_detective: Добавил: **${mess.author.username}**
+        :man_detective: Добавил: **${mess.author.username}**,
+        :alarm_clock: Время песни: ${video.timestamp}
         `)
         .setAuthor(`Автор видео: ${video.author.name}`)
         .setFooter(`Музыка на канале: ${connection.channel.name}`)
         .setThumbnail(video.image);
 
-        const reply = `${mess.author}`;
-
-        mess.channel.send(reply ,block);
+        mess.channel.send(mess.author ,block);
 
     }else{
       mess.channel.send("⚠ [Предупреждение]: Результаты поиска не найдены!");
@@ -231,21 +222,18 @@ async function leave(robot, mess, args) {
   }
 }
 
-async function skip(robot1, mess, args) {
+async function skip(robot, mess, args) {
   try {
-    const player = new Player(robot);
     const voiceChannel = mess.member.voice.channel;
     if (!voiceChannel) return mess.channel.send("⛔ [Ошибка]: Для выполнения этой команды вы должны находиться в канале где находится бот!");
-    const quest =  player.getQueue(mess.guild.id);
-    quest.setPaused(true);
   } catch (error) {
     console.error(error);
   }
-
 }
 
-//? вызов функции
+
 var comms_list = [
+  //? Settings category
   {
     name: "ping",
     out: ping
@@ -260,7 +248,7 @@ var comms_list = [
   },
 
 
-  //Music catrgory
+  //? Music category
   {
     name: "play",
     out: play

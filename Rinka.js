@@ -30,7 +30,7 @@ function Reloadchannelname(guild) {
     }
   }
 
-  setTimeout(reload, 8000);
+  setTimeout(reload, 10000);
 }
 
 robot.on("ready", () =>{
