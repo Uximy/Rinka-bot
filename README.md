@@ -13,8 +13,11 @@ node Rinka.js
 
 ![Alt-текст](https://i.ibb.co/9bVqvNL/Screenshot-2.png)
 
-# Entering the song title
-![Alt-текст](https://i.ibb.co/31PDCnr/Screenshot-2.png)
+# Entering a YouTube song link
+![Alt-текст](https://i.ibb.co/zSpWnTz/Screenshot-3.png)
 
-# Enter the song's link
-![Alt-текст](https://i.ibb.co/Y2NpRpS/Screenshot-3.png)
+# Entering a Spotify song link
+![Alt-текст](https://i.ibb.co/X2jHZ3W/Screenshot-4.png)
+
+# Enter a song title
+![Alt-текст](https://i.ibb.co/9pNFMVN/Screenshot-5.png)
