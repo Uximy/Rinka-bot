@@ -4,9 +4,9 @@ const comms = require("./comms.js");
 let config = require('./Config/config.json');
 const Channels = require('./Config/channels.json');
 const randomColor = require('randomcolor');
+const playerU = require('play-dl');
 
-
-function Reloadchannelname(guild) {
+const reload = function Reloadchannelname(guild) {
   const arr = Object.values(Channels.channels);
   var result = [];
   const channel_info = null;
@@ -19,34 +19,43 @@ function Reloadchannelname(guild) {
     category.push(value);
   }
 
-  function reload() {
-    try {
-      for (let i = 0; i < result.length; i++) {
-        const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
-        channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`);
-      }
-    } catch (error) {
-      console.error(error);
+  try {
+    for (let i = 0; i < result.length; i++) {
+      const channel_info = robot.channels.cache.find(chnl => chnl.name.startsWith(result[i]));
+      channel_info.setName(`${Channels.channels[category[i]].Name} ${eval(Channels.channels[category[i]].count_users)}`);
     }
+  } catch (error) {
+    console.error(error);
   }
 
-  setTimeout(reload, 10000);
 }
 
 robot.on("ready", () =>{
   robot.user.setPresence({
     status: config.activity.PresenceStatus,
     activity: {
-      name: config.activity.status,
+      name: config.prefix + 'help',
       type: config.activity.typestatus,
     }
   });
   console.log(`Бот ${robot.user.username} готов(-ва) к работе!`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);
-
+  playerU.setToken({
+    spotify: {
+      client_id: 'e9c14b2b086f4ded90836d4f2a9978a7',
+      client_secret: '528f219bbc274475af755cc3c080401b',
+      refresh_token: 'AQAXZL5zYc6BK_VAXS9p8TrYBJHHnoUIkzevcIYV95aDv2kPiuTBsVJOmwHY5E8Rs294eT5HZeO3kKAa0BS2O5gR36f7D33LZJKILvut-dE88zyMmztJT_0B1NZ0C2vC1ng',
+      market: 'KZ'
+    }
+  })
   const guild = robot.guilds.cache.get("809499536702570566");
-
-  setInterval(Reloadchannelname, 600000, guild);
+  const emojSpotify = guild.emojis.cache.find(em => em.name.startsWith('Spotify'));
+  const emojYouTube = guild.emojis.cache.find(em => em.name.startsWith('Youtube'));
+  const emojServers = guild.emojis.cache.find(em => em.name.startsWith('Servers'));
+  if(!emojSpotify) return guild.emojis.create('./img/Spotify_Emoji.png', 'Spotify')
+  if(!emojYouTube) return guild.emojis.create('./img/YouTube_Emoji.png', 'Youtube')   
+  if(!emojServers) return guild.emojis.create('./img/Servers.png', 'Servers')
+  setInterval(reload, 600000, guild);
 });
 
 

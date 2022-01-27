@@ -1,2 +1,4 @@
 node_modules
-Сonfig/config.json
+*.json
+*.txt
+old_code.js
