@@ -3,7 +3,7 @@
 bot is improved and something new is added
 
 to start the bot, write in the console
-```
+```Node
 node Rinka.js 
 ```
 
