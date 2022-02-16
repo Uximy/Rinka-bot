@@ -38,7 +38,7 @@ robot.on("ready", () =>{
       type: config.activity.typestatus,
     }
   });
-  console.log(`Бот ${robot.user.username} готов(-ва) к работе!`);
+  console.log(`Бот ${robot.user.username} готов(-ва) к работе! 🕵`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);
   playerU.setToken({
     spotify: {
@@ -60,11 +60,11 @@ robot.on("ready", () =>{
 
 
 robot.on("reconnecting", () => {
-  console.log(`Бот ${robot.user.username} реконектится!`);
+  console.log(`Бот ${robot.user.username} реконектится! 🔨`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);
 });
 robot.on("disconnect", () => {
-  console.log(`Бот ${robot.user.username} отключился!`);
+  console.log(`Бот ${robot.user.username} отключился! 💀`);
   console.log(`Статус бота ${robot.user.username} на данный момент: ${robot.user.presence.status}`);
 });
 
