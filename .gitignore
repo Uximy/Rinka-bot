@@ -2,3 +2,5 @@ node_modules
 *.json
 *.txt
 old_code.js
+img/musicImgSpotify.png
+img/musicImgYoutube.png
